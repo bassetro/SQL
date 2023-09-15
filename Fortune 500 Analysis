@@ -104,7 +104,7 @@ END as mother_friendliness
 FROM fortune_companies
 WHERE industry="Retail";
 
-# Assigning all the companies as "mother friendly", "acceptable", or "not mother friendly" based on the maternity leave, how many compnaies fall within each category?
+# Assigning all the companies as "mother friendly", "acceptable", or "not mother friendly" based on the maternity leave, how many companies fall within each category?
 SELECT
 COUNT (company_name),
 CASE 
