@@ -1,0 +1,62 @@
+#This project utilizes the follow Fictional Characters data: 
+
+CREATE table characters (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, type TEXT, story_id INTEGER, personality_id INTEGER);
+INSERT INTO characters(name, type, story_id, personality_id) VALUES ("Daisy", "duck", 1, 4);
+INSERT INTO characters(name, type, story_id, personality_id) VALUES ("Donald", "duck", 1, 3);
+INSERT INTO characters(name, type, story_id, personality_id) VALUES ("Goofy", "dog", 1, 1);
+INSERT INTO characters(name, type, story_id, personality_id) VALUES ("Minnie", "mouse", 1, 1);
+INSERT INTO characters(name, type, story_id, personality_id) VALUES ("Mickey", "mouse", 1, 2);
+INSERT INTO characters(name, type, story_id, personality_id) VALUES ("Pluto", "dog", 1, 5);
+INSERT INTO characters(name, type, story_id, personality_id) VALUES ("Cinderella", "princess", 2, 2);
+INSERT INTO characters(name, type, story_id, personality_id) VALUES ("Gus", "mouse", 2, 5);
+INSERT INTO characters(name, type, story_id, personality_id) VALUES ("Jaq", "mouse", 2, 6);
+INSERT INTO characters(name, type, story_id, personality_id) VALUES ("Prince Charming", "prince", 2, 1);
+INSERT INTO characters(name, type, story_id, personality_id) VALUES ("Bruno", "dog", 2, 2);
+INSERT INTO characters(name, type, story_id, personality_id) VALUES ("Fairy God Mother", "fairy", 2, 2);
+
+
+CREATE TABLE books (ID INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT);
+INSERT INTO books(name) VALUES ("Mickey Mouse");
+INSERT INTO books(name) VALUES ("Cinderella");
+
+CREATE TABLE couples (ID INTEGER PRIMARY KEY AUTOINCREMENT, character_id INTEGER, couple_name TEXT);
+INSERT INTO couples (character_id, couple_name) VALUES (1,"Donald");
+INSERT INTO couples (character_id, couple_name) VALUES (2,"Daisy");
+INSERT INTO couples (character_id, couple_name) VALUES (4,"Mickey");
+INSERT INTO couples (character_id, couple_name) VALUES (5,"Minnie");
+INSERT INTO couples (character_id, couple_name) VALUES (7,"Prince Charming");
+INSERT INTO couples (character_id, couple_name) VALUES (10,"Cinderella");
+
+CREATE TABLE personality(ID INTEGER PRIMARY KEY AUTOINCREMENT, personality TEXT);
+INSERT INTO personality(personality) VALUES ("brave");
+INSERT INTO personality(personality) VALUES ("kind");
+INSERT INTO personality(personality) VALUES ("mischievous");
+INSERT INTO personality(personality) VALUES ("diva");
+INSERT INTO personality(personality) VALUES ("loyal");
+INSERT INTO personality(personality) VALUES ("leader");
+
+SELECT* FROM characters;
+
+#Join tables to see what stories each character belongs to and rename columns appropriately.
+/*explicit inner join*/
+SELECT characters.name, books.name as story
+FROM characters
+JOIN books
+ON characters.story_id=books.id;
+
+#Join tables to show which characters are a couple within the list of characters and identify who they are.
+/*outer join*/
+SELECT characters.id, characters.name, couples.couple_name as couple
+FROM characters
+LEFT OUTER JOIN couples
+ON couples.character_id=characters.id;
+
+#Join the tables together in a easy to read fashion showing all the character names, personality, character types, and their couples' names, if they have any.
+SELECT characters.name, personality.personality, characters.type, books.name as story, couples.couple_name as couple
+FROM characters
+JOIN personality
+ON characters.personality_id=personality.id
+JOIN books 
+ON characters.story_id=books.id
+LEFT OUTER JOIN couples
+ON couples.character_id=characters.id;
