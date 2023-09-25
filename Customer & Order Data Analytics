@@ -108,7 +108,7 @@ Database: https://www.dropbox.com/s/cvsasmtr8syq2c2/BIT_DB?dl=0
 		WHERE length(orderid) = 6
 		AND orderid <> 'Order ID';
 	
-	13. Which product brought in the most revenue in January and how much revenue did it bring in total?
+	#13. Which product brought in the most revenue in January and how much revenue did it bring in total?
 		SELECT Product, sum(Quantity*price) as revenue
 		FROM BIT_DB.JanSales
 		WHERE length(orderid) = 6
