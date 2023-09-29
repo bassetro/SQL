@@ -1,0 +1,144 @@
+#In this SQL, I downloaded a database called Chinook and its data with a variety of tables to perform analystics about the digital media store. 
+#Some of this data includes artists, albums, media tracks, invoices, employees, and customers. 
+
+#I explored the data using the following SQL:
+
+#1) Show customers (full names, customer ID, and country) who are NOT in the US.
+		SELECT CustomerId, FirstName, LastName, Country
+		FROM chinook.customers
+		WHERE Country <>'USA';
+		
+#2) Show only the Customers from Brazil.
+		SELECT *
+		FROM chinook.customers
+		WHERE Country = 'Brazil';
+		
+#3) Find the Invoices of customers who are from Brazil - customer's full name, Invoice ID, Date of invoice, and billing country.
+		SELECT customers.FirstName, customers.LastName, invoices.Invoiceid, invoices.BillingCountry, invoices.InvoiceDate
+		FROM chinook.invoices 
+		LEFT JOIN chinook.customers
+		ON invoices.Customerid = customers.CustomerID
+		WHERE invoices.BillingCountry = 'Brazil';
+		
+#4) Show the Employees who are Sales Agents.
+		SELECT * 
+		FROM chinook.Employees
+		WHERE Title = "Sales Support Agent" ;
+		
+#5) Find a unique/distinct list of billing countries from the Invoice table.
+		SELECT distinct BillingCountry
+		FROM chinook.invoices;
+		
+#6) Provide a query that shows the invoices associated with each sales agent - Include Sales Agent's full name.
+		SELECT employees.FirstName, employees.LastName, invoices.Invoiceid
+		FROM chinook.customers
+		JOIN chinook.employees
+		ON customers.SupportRepid=employees.Employeeid
+		JOIN chinook.invoices
+		ON customers.Customerid=invoices.Customerid
+		WHERE employees.Title= 'Sales Support Agent';
+		
+#7) Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers.
+		SELECT 
+		employees.FirstName as AgentFistName, 
+		employees.LastName as AgentLastName, 
+		customers.FirstName as CustFirstName,
+		customers.LastName as CustLastName,
+		customers.Country as CustCountry,
+		invoices.Invoiceid,
+		invoices.Total
+		FROM chinook.customers
+		JOIN chinook.employees
+		ON customers.SupportRepid=employees.Employeeid
+		JOIN chinook.invoices
+		ON customers.Customerid=invoices.Customerid;
+		
+#8) How many invoices were there in 2009?
+		SELECT COUNT(invoices.InvoiceId)
+		FROM chinook.invoices
+		WHERE invoices.InvoiceDate like '2009%';
+		
+OR
+		SELECT COUNT(*)
+		FROM chinook.Invoices
+		WHERE InvoiceDate BETWEEN '2009-01-01' AND '2009-12-31';
+		
+#9) What are the total sales for 2009?
+		SELECT SUM(invoices.Total)
+		FROM chinook.invoices
+		WHERE invoices.InvoiceDate like '2009%';
+		
+#10) Write a query that includes the purchased track name with each invoice line ID.
+		SELECT 
+		invoice_items.Invoiceid,
+		tracks.Name as TrackName
+		FROM chinook.invoice_items
+		JOIN chinook.tracks
+		ON invoice_items.Trackid=tracks.Trackid;
+		
+#11) Write a query that includes the purchased track name AND artist name with each invoice line ID.
+		SELECT 
+		invoice_items.Invoiceid,
+		tracks.Name as TrackName,
+		artists.Name as Artist
+		FROM chinook.invoice_items
+		LEFT JOIN chinook.tracks
+		ON invoice_items.Trackid=tracks.Trackid
+		INNER JOIN chinook.albums
+		ON tracks.Albumid=albums.Albumid
+		LEFT JOIN chinook.artists
+		ON albums.Artistid=artists.Artistid;
+		
+#12) Provide a query that shoes all the Tracks, and include the Album name, media type, and Genre.
+		SELECT 
+		tracks.Name as TrackName,
+		albums.Title as Album,
+		media_types.Name as MediaType,
+		genres.Name as Genre
+		FROM chinook.tracks
+		JOIN chinook.albums
+		ON tracks.Albumid=albums.Albumid
+		JOIN chinook.media_types
+		ON tracks.MediaTypeid=media_types.MediaTypeid
+		JOIN chinook.genres
+		ON tracks.Genreid=genres.Genreid;
+		
+#13) Show the total sales made by each sales agent.
+		SELECT 
+		employees.FirstName as AgentFistName, 
+		employees.LastName as AgentLastName, 
+		ROUND(SUM(invoices.Total),2) as TotalSales
+		FROM chinook.customers
+		JOIN chinook.employees
+		ON customers.SupportRepid=employees.Employeeid
+		JOIN chinook.invoices
+		ON customers.Customerid=invoices.Customerid
+		GROUP BY AgentLastName;
+		
+#14) Which sales agent made the most dollars in sales in 2009?
+		SELECT 
+		employees.FirstName as AgentFistName, 
+		employees.LastName as AgentLastName, 
+		ROUND(SUM(invoices.Total),2) as TotalSales
+		FROM chinook.customers
+		JOIN chinook.employees
+		ON customers.SupportRepid=employees.Employeeid
+		JOIN chinook.invoices
+		ON customers.Customerid=invoices.Customerid
+		WHERE invoices.InvoiceDate like '2009%'
+		GROUP BY AgentLastName
+		ORDER BY (ROUND(SUM(invoices.Total),2)) DESC LIMIT 1;
+		
+#15) CTE  - Make a list of the tracks that were bought 4 or more times and give them a label that says "Top Pick".
+		WITH quantity_sold_CTE AS(SELECT SUM(invoice_items.quantity) as TotalSold,tracks.Trackid, tracks.Name 
+		FROM invoice_items
+		JOIN tracks
+		ON invoice_items.TrackId=tracks.Trackid
+		GROUP BY Name)
+		SELECT TotalSold, Name, 'Top Pick' as 'label'
+		FROM quantity_sold_CTE
+		WHERE TotalSold>=4
+		ORDER BY TotalSold DESC;
+		
+#16) Update the Sales Support Agent titles to say "Sales Agent".
+		UPDATE employees SET Title='Sales Agent' WHERE Title='Sales Support Agent';
